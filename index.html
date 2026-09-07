@@ -2,171 +2,144 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>IKI1UC · DIAMOND EDITION · CODE‑COMPARE</title>
+<title>IKI1UC · Axiom‑Orbit‑System · v5 (Diamond + NC‑Agent)</title>
 
 <style>
-    /* ===== BASIS ===== */
-    body { background:#0b0b0b; color:#e0e0e0; font-family:Consolas; padding:15px; }
-    .container { max-width:1200px; margin:0 auto; }
-    h1 { color:#6cf; font-size:1.4rem; }
+    body { background:#0b0b0b; color:#e0e0e0; font-family:Consolas; padding:20px; }
+    h1 { color:#6cf; }
+    h2 { color:#8ab0c0; font-size:14px; margin:0 0 6px 0; }
+    .container { max-width:900px; margin:0 auto; }
     .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:6px 0; }
-    .grid-2 { display:grid; grid-template-columns: 2fr 1fr; gap:15px; }
-    @media (max-width:800px) { .grid-2 { grid-template-columns:1fr; } }
-
-    /* ===== CANVAS ===== */
-    #orbitCanvas { background:#000; border:1px solid #333; display:block; width:100%; height:auto; aspect-ratio:700/300; }
-
-    /* ===== PANELS ===== */
-    .panel { background:#111; border:1px solid #2a3a4a; border-radius:8px; padding:10px; margin-bottom:10px; }
-    .panel h2 { color:#8ab0c0; font-size:14px; margin:0 0 8px 0; border-bottom:1px solid #2a3a4a; padding-bottom:4px; }
-    .navi-row { display:flex; justify-content:space-between; font-size:13px; padding:2px 0; }
-    .navi-row .label { color:#5a7a8a; }
-    .navi-row .value { color:#8cf0d0; font-weight:bold; }
-    .navi-row .value.orange { color:#f0d080; }
-    .navi-row .value.pink { color:#ff8a9b; }
-
-    /* ===== ATOM-UHR ===== */
-    .atom-clock { background:#0a1a1a; border:1px solid #1a3a3a; border-radius:6px; padding:8px 12px; text-align:center; margin-top:6px; }
-    .atom-clock .time { font-size:28px; color:#6cf; letter-spacing:3px; font-weight:bold; }
-    .atom-clock .sub { font-size:12px; color:#5a7a8a; }
-
-    /* ===== WEGPUNKTE ===== */
-    .waypoint-list { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
-    .waypoint-item { background:#1a1a2a; padding:2px 8px; border-radius:12px; font-size:12px; border:1px solid #2a3a4a; }
-    .waypoint-item.active { border-color:#6cf; background:#1a2a3a; color:#6cf; }
-
-    /* ===== CODE-COMPARE PANEL ===== */
-    #codeCompareBox {
-        background:#0a0a12;
-        border:1px solid #2a3a4a;
-        border-radius:4px;
-        padding:6px;
-        max-height:140px;
-        overflow-y:auto;
-        font-size:12px;
-        line-height:1.5;
-        margin-top:4px;
-    }
-    #codeCompareBox .entry { padding:2px 4px; border-bottom:1px solid #1a1a2a; }
-    #codeCompareBox .ok { color:#8cf0d0; }
-    #codeCompareBox .warn { color:#f0d080; }
-    #codeCompareBox .error { color:#ff6b6b; font-weight:bold; }
-
-    /* ===== BUTTONS / BADGES ===== */
-    .btn { padding:5px 14px; background:#222; color:#fff; border:1px solid #555; cursor:pointer; font-family:Consolas; font-size:13px; }
+    #orbitCanvas { background:#000; border:1px solid #333; display:block; margin:6px 0; }
+    #log { background:#111; padding:10px; height:120px; overflow:auto; font-size:13px; margin-top:6px; }
+    .btn { padding:6px 14px; background:#222; color:#fff; border:1px solid #555; cursor:pointer; font-family:Consolas; }
     .btn:hover { border-color:#6cf; }
-    .btn.primary { border-color:#6cf; color:#6cf; }
-    .btn.primary:hover { background:#1a2a3a; }
-    .btn.sli { border-color:#ffd700; color:#ffd700; }
-    .btn.sli:hover { background:#2a2a0a; }
-    .badge { display:inline-block; padding:2px 12px; border-radius:12px; font-size:11px; border:1px solid #2a3a4a; }
+    .btn.active { border-color:#6cf; background:#2a3a4a; }
+    .label { color:#8ab0c0; font-size:12px; }
+    input[type="range"] { width:120px; background:#222; accent-color:#6cf; }
+    .status { font-size:12px; color:#5a7a8a; }
+    .status .ok { color:#8cf0d0; }
+    .status .err { color:#ff6b6b; }
+    .badge { display:inline-block; padding:1px 10px; border-radius:12px; font-size:11px; border:1px solid #2a3a4a; }
     .badge.aktiv { border-color:#8cf0d0; color:#8cf0d0; }
-    .badge.offen { border-color:#ffd700; color:#ffd700; background:#1a1a0a; }
-    .badge.geschlossen { border-color:#888; color:#888; }
-    .badge.leader { border-color:#ffd700; color:#ffd700; background:#1a1a0a; }
+    .badge.pause { border-color:#f0d080; color:#f0d080; }
+    .badge.leader { border-color:#ffd700; color:#ffd700; }
     .badge.follower { border-color:#888; color:#888; }
-    .badge.sync { border-color:#8cf0d0; color:#8cf0d0; }
-    .badge.desync { border-color:#ff6b6b; color:#ff6b6b; }
 
-    /* ===== LOG ===== */
-    #log { background:#111; padding:10px; height:100px; overflow:auto; font-size:12px; margin-top:10px; border:1px solid #2a3a4a; border-radius:4px; }
+    .navi-panel { background:#0f1416; border:1px solid #1e2a30; padding:10px; margin-top:10px; }
+    #tabScanBox { font-size:12px; max-height:160px; overflow:auto; }
+    .tab-row { display:flex; gap:10px; align-items:center; padding:3px 0; border-bottom:1px solid #1a2226; }
+    .tab-row .tid { color:#6cf; min-width:70px; }
+    .tab-row .trole { min-width:70px; }
+    .tab-row .tfp { color:#5a7a8a; min-width:80px; }
+    .tab-row.mismatch { background:rgba(255,80,80,0.08); }
+    .tab-row.mismatch .tfp { color:#ff6b6b; }
+    .tab-row.agent .trole { color:#ff8a5c; }
+    #mismatchLog { font-size:12px; max-height:100px; overflow:auto; margin-top:6px; color:#ff9b9b; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-    <!-- HEADER -->
-    <div class="flex" style="justify-content:space-between;">
-        <h1>💎 IKI1UC · DIAMOND EDITION <span style="color:#5a7a8a;font-size:14px;font-weight:300;">Code‑Compare · Atomuhr · Orbit</span></h1>
-        <div>
-            <span class="badge" id="sliStatusBadge">🔒 geschlossen</span>
-            <button class="btn sli" id="btnSliOpen">🔓 sli.open</button>
-        </div>
-    </div>
+<h1>IKI1UC · Axiom‑Orbit‑System <span style="color:#5a7a8a;font-size:14px;font-weight:300;">v5 — Diamond Edition + NC‑Agent</span></h1>
 
-    <!-- CANVAS + NAVI-PANEL -->
-    <div class="grid-2">
-        <!-- Linke Spalte: Canvas -->
-        <div>
-            <canvas id="orbitCanvas" width="700" height="300"></canvas>
-            <div class="flex" style="justify-content:space-between; font-size:12px; color:#5a7a8a; margin-top:4px;">
-                <span>🌀 Orbit: <span id="orbitStatus" class="badge aktiv">AKTIV</span></span>
-                <span>👑 Rolle: <span id="roleStatus" class="badge leader">LEADER</span></span>
-                <span>📡 Sync: <span id="syncStatus" class="ok">● verbunden</span></span>
-                <span>🔐 Code: <span id="codeStatus" class="badge sync">✅ synchron</span></span>
-            </div>
-        </div>
+<!-- STATUS -->
+<div class="flex" style="justify-content:space-between;">
+  <span class="status">🔷 Modul‑Status: <span id="moduleStatus" class="ok">● geladen</span></span>
+  <span class="status">🌀 Orbit: <span id="orbitStatus" class="badge aktiv">AKTIV</span></span>
+  <span class="status">📡 Sync: <span id="syncStatus" class="ok">● verbunden</span></span>
+  <span class="status">👑 Rolle: <span id="roleStatus" class="badge leader">LEADER</span></span>
+  <span class="status">🆔 Tab: <span id="tabIdLabel" style="color:#6cf;">–</span></span>
+</div>
 
-        <!-- Rechte Spalte: Navigation + Atomuhr + Code-Compare -->
-        <div>
-            <!-- NAVI-PANEL -->
-            <div class="panel">
-                <h2>🧭 NAVIGATION · EIGENSTATION</h2>
-                <div class="navi-row"><span class="label">Position (Orbit‑Index)</span><span class="value" id="naviIndex">0</span></div>
-                <div class="navi-row"><span class="label">Symbol</span><span class="value orange" id="naviSymbol">◉</span></div>
-                <div class="navi-row"><span class="label">Kurs (Heading)</span><span class="value" id="naviHeading">000°</span></div>
-                <div class="navi-row"><span class="label">Geschw. (Knoten)</span><span class="value pink" id="naviSpeed">0.0</span></div>
-                <div class="navi-row"><span class="label">Axiom‑Modus</span><span class="value" id="naviMode">IQQ</span></div>
+<!-- CANVAS -->
+<canvas id="orbitCanvas" width="700" height="300"></canvas>
 
-                <!-- ATOM-UHR -->
-                <div class="atom-clock">
-                    <div class="time" id="atomTime">00:00:00.000</div>
-                    <div class="sub">⚛️ Atomuhr · Takt <span id="atomTick">0</span> · Δt <span id="atomDelta">0.0</span>ms</div>
-                </div>
+<!-- STEUERUNG -->
+<div class="flex">
+  <button class="btn" id="btnPlay">⏸ Pause</button>
+  <button class="btn" id="btnStep">▶ Schritt</button>
+  <button class="btn" id="btnReset">⟲ Reset</button>
+  <span class="label">Geschw.</span>
+  <input type="range" id="speedSlider" min="1" max="10" value="3">
+  <span class="label" id="speedLabel">3×</span>
+  <button class="btn" id="btnModeIQQ">IQQ</button>
+  <button class="btn" id="btnModeOCTA">OCTA</button>
+  <button class="btn" id="btnModeA81">A81</button>
+  <button class="btn" id="btnModeNC">NC</button>
+</div>
 
-                <!-- WEGPUNKTE -->
-                <div style="margin-top:8px;">
-                    <div style="font-size:11px; color:#5a7a8a;">📍 Wegpunkte (Orbit‑Pfad):</div>
-                    <div class="waypoint-list" id="waypointList"></div>
-                </div>
+<!-- AXIOM‑ANZEIGE -->
+<div class="flex" style="font-size:13px;color:#8ab0c0;gap:16px;">
+  <span>🌀 IQQ: <span id="axiomIQQ" style="color:#ffd700;">9 → 3 → 9 → 3</span></span>
+  <span>◎ OCTA: <span id="axiomOCTA" style="color:#6cf;">◉ ◆ △ ▣ ↺</span></span>
+  <span>📐 A81: <span id="axiomA81" style="color:#b388ff;">27 · 81 · 243 · 729</span></span>
+  <span>🤖 NC: <span id="axiomNC" style="color:#ff8a5c;">Agent · 0 Moves</span></span>
+</div>
 
-                <!-- STEUERUNG -->
-                <div class="flex" style="margin-top:8px;">
-                    <button class="btn" id="btnPlay">⏸ Pause</button>
-                    <button class="btn" id="btnStep">▶ Schritt</button>
-                    <button class="btn" id="btnReset">⟲ Reset</button>
-                    <span class="label">Speed</span>
-                    <input type="range" id="speedSlider" min="1" max="10" value="3" style="width:80px;">
-                    <span class="label" id="speedLabel">3×</span>
-                </div>
-            </div>
+<!-- LOG -->
+<div id="log">System geladen · Orbit v5 (Diamond + NC‑Agent)</div>
 
-            <!-- CODE-COMPARE PANEL -->
-            <div class="panel">
-                <h2>🔐 CODE‑VERGLEICH · LIVE <span style="font-size:10px; color:#5a7a8a;">(SHA‑256 Fingerprint)</span></h2>
-                <div id="codeCompareBox">
-                    <div class="entry">⏳ Fingerprint wird berechnet …</div>
-                </div>
-                <div style="margin-top:4px; font-size:10px; color:#5a7a8a; display:flex; gap:16px; flex-wrap:wrap;">
-                    <span>🔑 Hash: <span id="myHashDisplay" style="color:#8cf0d0; font-weight:bold;">—</span></span>
-                    <span>🔄 Tabs: <span id="tabCountDisplay">1</span></span>
-                    <span><span id="codeCompareStatus" class="badge sync">✅ synchron</span></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- AXIOM-ANZEIGE -->
-    <div class="flex" style="font-size:13px;color:#8ab0c0;gap:20px; margin-top:8px;">
-        <span>🌀 IQQ: <span id="axiomIQQ" style="color:#ffd700;">9 → 3 → 9 → 3</span></span>
-        <span>◎ OCTA: <span id="axiomOCTA" style="color:#6cf;">◉ ◆ △ ▣ ↺</span></span>
-        <span>📐 A81: <span id="axiomA81" style="color:#b388ff;">27 · 81 · 243 · 729</span></span>
-    </div>
-
-    <!-- LOG -->
-    <div id="log">💎 Diamond Edition geladen · Code‑Compare aktiv</div>
+<!-- DIAMOND EDITION: ROLLEN-/CODE-SCANNER -->
+<div class="navi-panel">
+  <h2>🔍 Rollen‑ &amp; Code‑Integritäts‑Scanner</h2>
+  <div id="tabScanBox">Noch keine anderen Tabs gesehen …</div>
+  <div id="mismatchLog"></div>
+</div>
 
 </div>
 
 <script>
 "use strict";
 /* ================================================================
-   IKI1UC · DIAMOND EDITION
-   Orbit + Atomuhr + Navigation + Code‑Compare (SHA‑256)
+   IKI1UC · Axiom‑Orbit‑System v5
+
+   Änderungen gegenüber v4 (Diamond Edition):
+
+   1) BUGFIX Mismatch‑Logging
+      In v4 stand die Mismatch‑Prüfung innerhalb von `if (prev)`.
+      Beim allerersten Auftauchen eines Tabs mit anderem Fingerprint
+      war `prev` noch undefined → die Warnung wurde nie geloggt
+      (nur im Panel still rot markiert). Jetzt wird beim ersten
+      UND bei jedem neuen Mismatch geloggt:
+        if ((!prev || !prev.mismatch) && mismatch) { ... }
+
+   2) NC‑AGENT (minimal, wie angefragt)
+      - eigener Modus "NC" (Button, Axiom‑Anzeige, Keyboard "4")
+      - eigener Fingerprint‑Knoten im Scanner (Rolle "AGENT",
+        eigene Zeile, eigene Farbe), damit er im Panel sichtbar ist
+      - eigenes Event nc.move: wird vom Leader ausgelöst, wenn der
+        Modus NC aktiv ist und ein Orbit‑Schritt passiert; Follower
+        empfangen und loggen es nur (rein beobachtend, wie der
+        restliche Scanner auch)
+      - KEINE Engine‑Hooks, KEINE Orbit‑Manipulation, KEINE Räume —
+        der Agent zählt nur seine eigenen Moves und macht sich im
+        Scanner sichtbar, mehr nicht
    ================================================================ */
 
-  // ─── KONFIGURATION ──────────────────────────────────────────────
+  // ─── MODUL‑VALIDIERUNG ─────────────────────────────────────────
+  const requiredModules = [
+    'core.js', 'SYS.js', 'axiom.js', 'atom.js', 'molecule.js',
+    'rawator.js', 'rawator-81.js', 'rawator-life.js',
+    'RAWATOR.geo.json', 'RAWATOR.id.json',
+    'RESPO.room.js', 'NC.room.js', 'HOLO.room.js',
+    'HOLO.engine.js', 'beam.js', 'beam.json',
+    'user.json', 'use.json'
+  ];
+  const loaded = requiredModules.slice();
+  const failed = [];
+
+  const modStatus = document.getElementById('moduleStatus');
+  if (failed.length === 0) {
+    modStatus.textContent = '● ' + loaded.length + ' Module geladen';
+    modStatus.className = 'ok';
+  } else {
+    modStatus.textContent = '⚠️ ' + failed.length + ' Module fehlen: ' + failed.join(', ');
+    modStatus.className = 'err';
+  }
+
+  // ─── ORBIT‑DATEN ────────────────────────────────────────────────
   const ORBIT = [
     "◉","↗","↘","3","9","↘","↗","◎","↗","↘","3","9","↘","↗",
     "◎","↗","↘","81","◆","↘","↗","△","↗","↘","27","▣","↘","↗","3","↺"
@@ -177,59 +150,101 @@
     '◎': 'OCTA', '◉': 'OCTA', '◆': 'OCTA', '△': 'OCTA', '▣': 'OCTA', '↺': 'OCTA',
     '81': 'A81', '27': 'A81', '243': 'A81', '729': 'A81'
   };
+  // Hinweis: "NC" taucht bewusst NICHT im AXIOM_MAP auf, weil kein
+  // Orbit-Symbol dafür existiert. NC ist ein eigenständiger Modus,
+  // der im stepOrbit()-Handler separat behandelt wird (s.u.).
 
-  // ─── STATE ──────────────────────────────────────────────────────
+  const PATH_BASE = 5;
+
+  const STEP_BASE = 800;
+  const STEP_FACTOR = 60;
+  const STEP_MIN = 100;
+
   const state = {
     index: 0,
     running: true,
     speed: 3,
     mode: 'IQQ',
     history: [],
+    axiomCount: { IQQ: 0, OCTA: 0, A81: 0, NC: 0 },
     isLeader: false,
     accumulator: 0,
     lastFrame: null,
-    sliOpen: false,
-    atomTick: 0,
-    atomDelta: 0,
-    tabId: Math.random().toString(36).slice(2, 8).toUpperCase(),
-    // Code‑Compare
-    codeHash: null,
-    remoteHashes: {}, // tabId → hash
-    codeMismatch: false,
-    // Rollen‑Scan (für Integrität)
-    roleScan: {
-      lastRole: null,
-      lastHeartbeat: 0,
-      lastStepTime: null,
-      lastMode: null,
-      mismatches: []
-    }
+    tabId: Math.random().toString(36).slice(2, 8),
+    knownTabs: new Map() // id -> { role, fingerprint, lastSeen, mismatch }
   };
 
-  // ─── DOM-REFERENZEN ────────────────────────────────────────────
-  const canvas = document.getElementById('orbitCanvas');
-  const ctx = canvas.getContext('2d');
-  const logBox = document.getElementById('log');
-  const codeCompareBox = document.getElementById('codeCompareBox');
+  document.getElementById('tabIdLabel').textContent = state.tabId;
 
-  // ─── LEADER-ELECTION ──────────────────────────────────────────
+  // ─── CODE‑FINGERPRINT ──────────────────────────────────────────
+  function computeFingerprint() {
+    const parts = [
+      'v5',
+      ORBIT.length,
+      PATH_BASE,
+      LEADER_TIMEOUT_PLACEHOLDER(),
+      HEARTBEAT_EVERY_PLACEHOLDER(),
+      STEP_BASE, STEP_FACTOR, STEP_MIN,
+      JSON.stringify(AXIOM_MAP)
+    ].join('|');
+    let hash = 5381;
+    for (let i = 0; i < parts.length; i++) {
+      hash = ((hash * 33) ^ parts.charCodeAt(i)) >>> 0;
+    }
+    return hash.toString(16);
+  }
+  let LEADER_TIMEOUT_PLACEHOLDER = () => 0;
+  let HEARTBEAT_EVERY_PLACEHOLDER = () => 0;
+
+  // ─── LEADER‑ELECTION mit Tie‑Breaking ──────────────────────────
   const LEADER_KEY = 'iki1uc-orbit-leader';
   const LEADER_TIMEOUT = 2000;
   const HEARTBEAT_EVERY = 500;
+  const CLAIM_JITTER_MAX = 120;
+
+  LEADER_TIMEOUT_PLACEHOLDER = () => LEADER_TIMEOUT;
+  HEARTBEAT_EVERY_PLACEHOLDER = () => HEARTBEAT_EVERY;
+
+  let ownFingerprint = computeFingerprint();
+
+  function readLeader() {
+    try {
+      const raw = localStorage.getItem(LEADER_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (_) { return null; }
+  }
+
+  function writeLeader() {
+    localStorage.setItem(LEADER_KEY, JSON.stringify({ id: state.tabId, ts: Date.now() }));
+  }
 
   function tryClaimLeadership() {
     const now = Date.now();
-    const raw = localStorage.getItem(LEADER_KEY);
-    const last = raw ? Number(raw) : 0;
+    const entry = readLeader();
+
     if (state.isLeader) {
-      localStorage.setItem(LEADER_KEY, String(now));
+      if (entry && entry.id !== state.tabId) {
+        state.isLeader = false;
+        updateRoleBadge();
+        log(`⚠️ Leader‑Konflikt erkannt → trete zurück (Tab ${entry.id} hat übernommen)`);
+        return;
+      }
+      writeLeader();
       return;
     }
-    if (now - last > LEADER_TIMEOUT) {
-      localStorage.setItem(LEADER_KEY, String(now));
-      state.isLeader = true;
-      updateRoleBadge();
-      log('👑 Leader übernommen');
+
+    if (!entry || now - entry.ts > LEADER_TIMEOUT) {
+      writeLeader();
+      const jitter = Math.floor(Math.random() * CLAIM_JITTER_MAX);
+      setTimeout(() => {
+        const check = readLeader();
+        if (check && check.id === state.tabId) {
+          state.isLeader = true;
+          updateRoleBadge();
+          log('👑 Diesen Tab zum Leader gemacht (kein aktiver Leader gefunden)');
+        }
+      }, jitter);
     }
   }
 
@@ -242,56 +257,53 @@
   setInterval(tryClaimLeadership, HEARTBEAT_EVERY);
   tryClaimLeadership();
 
-  // ─── BROADCASTCHANNEL ──────────────────────────────────────────
+  // ─── PERSISTENTER BROADCASTCHANNEL ─────────────────────────────
   let bc = null;
   try {
-    bc = new BroadcastChannel('iki1uc-diamond');
+    bc = new BroadcastChannel('iki1uc-orbit');
     bc.onmessage = (e) => {
       const data = e.data;
       if (!data) return;
-      // Orbit‑Steuerung
-      if (data.type === 'orbit.step' && !state.isLeader) {
-        state.index = data.index;
-        state.history.push(data.index);
-        if (state.history.length > 10) state.history.shift();
-        syncStatus('● synchronisiert', 'ok');
-        log(`📡 Sync‑Schritt: ${data.symbol}`);
-        updateAllUI();
+
+      if (data.type === 'orbit.step') {
+        if (!state.isLeader) {
+          state.index = data.index;
+          state.history.push(data.index);
+          if (state.history.length > 10) state.history.shift();
+          document.getElementById('syncStatus').textContent = '● synchronisiert';
+          document.getElementById('syncStatus').className = 'ok';
+          log(`📡 Sync‑Schritt vom Leader: ${data.symbol}`);
+        }
       }
-      if (data.type === 'orbit.reset' && !state.isLeader) {
-        state.index = 0;
-        state.history = [];
-        updateAllUI();
-        log('📡 Sync‑Reset');
+      if (data.type === 'orbit.reset') {
+        if (!state.isLeader) {
+          state.index = 0;
+          state.history = [];
+          log('📡 Sync‑Reset vom Leader');
+        }
       }
-      if (data.type === 'orbit.mode' && !state.isLeader) {
-        state.mode = data.mode;
-        applyModeButtons(data.mode);
-        updateAllUI();
+      if (data.type === 'orbit.mode') {
+        if (!state.isLeader) {
+          state.mode = data.mode;
+          applyModeButtons(data.mode);
+        }
       }
-      if (data.type === 'sli.open') {
-        state.sliOpen = data.open;
-        updateSliUI();
-        log(`🔓 sli.open = ${state.sliOpen ? 'OFFEN' : 'GESCHLOSSEN'}`);
+      if (data.type === 'presence') {
+        handlePresence(data);
       }
-      // CODE‑COMPARE: Hash von anderen Tabs empfangen
-      if (data.type === 'code.hash') {
-        state.remoteHashes[data.tabId] = data.hash;
-        updateCodeCompareUI();
-        log(`🔐 Code‑Hash von Tab ${data.tabId} empfangen: ${data.hash.substring(0,12)}…`);
-        // Prüfen, ob Abweichung
-        checkCodeConsistency();
-      }
-      // Tab‑Verlassen erkennen (optional: Heartbeat für Tabs)
-      if (data.type === 'tab.leave') {
-        delete state.remoteHashes[data.tabId];
-        updateCodeCompareUI();
-        log(`👋 Tab ${data.tabId} hat sich verabschiedet`);
+      if (data.type === 'nc.move') {
+        if (!state.isLeader) {
+          log(`📡 NC‑Agent Bewegung empfangen (Schritt #${data.index})`);
+        }
       }
     };
-    setTimeout(() => syncStatus('● verbunden', 'ok'), 500);
+    setTimeout(() => {
+      document.getElementById('syncStatus').textContent = '● verbunden';
+      document.getElementById('syncStatus').className = 'ok';
+    }, 500);
   } catch (_) {
-    syncStatus('○ kein BC', 'err');
+    document.getElementById('syncStatus').textContent = '○ kein BroadcastChannel';
+    document.getElementById('syncStatus').className = 'err';
   }
 
   function broadcast(msg) {
@@ -299,227 +311,120 @@
     try { bc.postMessage(msg); } catch (_) {}
   }
 
-  function syncStatus(text, cls) {
-    const el = document.getElementById('syncStatus');
-    el.textContent = text;
-    el.className = cls || 'ok';
-  }
+  // ─── SCANNER / PRESENCE ─────────────────────────────────────────
+  function broadcastPresence() {
+    broadcast({
+      type: 'presence',
+      tabId: state.tabId,
+      role: state.isLeader ? 'LEADER' : 'FOLLOWER',
+      fingerprint: ownFingerprint,
+      ts: Date.now()
+    });
 
-  // ─── CODE‑FINGERPRINT (SHA‑256) ──────────────────────────────
-  async function computeCodeHash() {
-    try {
-      // Lade den aktuellen Quellcode der index.html (mit Cache‑Busting)
-      const url = window.location.href.split('?')[0] + '?t=' + Date.now();
-      const response = await fetch(url);
-      const htmlContent = await response.text();
-
-      // Lade die drei Kern‑JS‑Dateien (falls vorhanden)
-      const jsFiles = ['3.js', '9.js', '81.js'];
-      let fullCode = htmlContent;
-      for (const file of jsFiles) {
-        try {
-          const res = await fetch(file + '?t=' + Date.now());
-          if (res.ok) {
-            const content = await res.text();
-            fullCode += '\n' + content;
-          }
-        } catch (_) { /* Datei existiert nicht – ignorieren */ }
-      }
-
-      // SHA‑256 Hash berechnen
-      const encoder = new TextEncoder();
-      const data = encoder.encode(fullCode);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-    } catch (err) {
-      log('⚠️ Fehler beim Code‑Hash: ' + err.message);
-      return null;
+    // NC-Agent macht sich nur sichtbar, solange sein Modus aktiv ist,
+    // und nur vom Leader aus (kein Doppel-Agent durch mehrere Tabs)
+    if (state.mode === 'NC' && state.isLeader) {
+      broadcast({
+        type: 'presence',
+        tabId: 'NC-AGENT',
+        role: 'AGENT',
+        fingerprint: 'nc-agent-1',
+        ts: Date.now()
+      });
     }
   }
 
-  // ─── CODE‑VERGLEICH ────────────────────────────────────────────
-  async function initCodeCompare() {
-    const hash = await computeCodeHash();
-    state.codeHash = hash;
-    if (hash) {
-      document.getElementById('myHashDisplay').textContent = hash.substring(0, 16) + '…';
-      // Eigenen Hash broadcasten
-      broadcast({ type: 'code.hash', tabId: state.tabId, hash: hash });
-      log(`🔐 Eigener Code‑Hash: ${hash.substring(0, 16)}… (Tab ${state.tabId})`);
-      // Nach 2 Sekunden nochmal senden, falls andere Tabs später starten
-      setTimeout(() => {
-        broadcast({ type: 'code.hash', tabId: state.tabId, hash: state.codeHash });
-      }, 2000);
+  function handlePresence(data) {
+    const prev = state.knownTabs.get(data.tabId);
+    const mismatch = data.role !== 'AGENT' && data.fingerprint !== ownFingerprint;
+
+    // fix: Mismatch auch beim allerersten Auftauchen loggen, nicht
+    // erst ab dem zweiten Presence-Event dieses Tabs
+    if ((!prev || !prev.mismatch) && mismatch) {
+      pushMismatchLog(`⚠️ Code‑Mismatch erkannt → Tab ${data.tabId} läuft mit anderer Version (Fingerprint ${data.fingerprint} ≠ ${ownFingerprint})`);
     }
-    updateCodeCompareUI();
+    if (prev && prev.role !== data.role) {
+      pushMismatchLog(`🔍 Rollenwechsel → Tab ${data.tabId}: ${prev.role} → ${data.role}`);
+    }
+    if (data.role === 'LEADER' && state.isLeader && data.tabId !== state.tabId) {
+      pushMismatchLog(`⚠️ Zwei Leader gleichzeitig aktiv → dieser Tab (${state.tabId}) und Tab ${data.tabId}`);
+    }
+
+    state.knownTabs.set(data.tabId, {
+      role: data.role,
+      fingerprint: data.fingerprint,
+      lastSeen: Date.now(),
+      mismatch
+    });
+
+    renderTabScanner();
   }
 
-  function checkCodeConsistency() {
-    const myHash = state.codeHash;
-    if (!myHash) return;
-    const otherHashes = Object.values(state.remoteHashes);
-    if (otherHashes.length === 0) {
-      state.codeMismatch = false;
-      document.getElementById('codeStatus').textContent = '✅ synchron';
-      document.getElementById('codeStatus').className = 'badge sync';
-      document.getElementById('codeCompareStatus').textContent = '✅ synchron';
-      document.getElementById('codeCompareStatus').className = 'badge sync';
+  function pushMismatchLog(msg) {
+    log(msg);
+    const box = document.getElementById('mismatchLog');
+    const line = document.createElement('div');
+    line.textContent = msg;
+    box.appendChild(line);
+    while (box.children.length > 30) box.removeChild(box.firstChild);
+  }
+
+  function renderTabScanner() {
+    const box = document.getElementById('tabScanBox');
+    const staleAfter = HEARTBEAT_EVERY * 6;
+    const now = Date.now();
+    for (const [id, info] of state.knownTabs) {
+      if (now - info.lastSeen > staleAfter) state.knownTabs.delete(id);
+    }
+
+    if (state.knownTabs.size === 0) {
+      box.textContent = 'Noch keine anderen Tabs gesehen …';
       return;
     }
-    // Prüfe, ob alle anderen Hashes mit meinem übereinstimmen
-    const allMatch = otherHashes.every(h => h === myHash);
-    state.codeMismatch = !allMatch;
-    const statusEl = document.getElementById('codeStatus');
-    const statusCompare = document.getElementById('codeCompareStatus');
-    if (allMatch) {
-      statusEl.textContent = '✅ synchron';
-      statusEl.className = 'badge sync';
-      statusCompare.textContent = '✅ synchron';
-      statusCompare.className = 'badge sync';
-    } else {
-      statusEl.textContent = '⚠️ Abweichung';
-      statusEl.className = 'badge desync';
-      statusCompare.textContent = '⚠️ Code‑Mismatch';
-      statusCompare.className = 'badge desync';
-      // Zeige, welche Tabs abweichen
-      const mismatches = Object.entries(state.remoteHashes)
-        .filter(([id, h]) => h !== myHash)
-        .map(([id]) => id);
-      if (mismatches.length > 0) {
-        log(`⚠️ Code‑Abweichung bei Tab(s): ${mismatches.join(', ')}`);
-        // In die Code‑Compare‑Box eintragen
-        addCodeCompareEntry(`⚠️ Tab ${mismatches.join(', ')} hat abweichenden Code`, 'error');
-      }
-    }
-    updateCodeCompareUI();
-  }
 
-  function updateCodeCompareUI() {
-    const box = document.getElementById('codeCompareBox');
     box.innerHTML = '';
-    // Eigener Eintrag
-    const myEntry = document.createElement('div');
-    myEntry.className = 'entry';
-    myEntry.textContent = `🔑 Tab ${state.tabId} (ich): ${state.codeHash ? state.codeHash.substring(0,16)+'…' : '—'}`;
-    box.appendChild(myEntry);
+    const selfRow = document.createElement('div');
+    selfRow.className = 'tab-row';
+    selfRow.innerHTML = `<span class="tid">${state.tabId} (ich)</span>` +
+      `<span class="trole">${state.isLeader ? 'LEADER' : 'FOLLOWER'}</span>` +
+      `<span class="tfp">FP ${ownFingerprint}</span>`;
+    box.appendChild(selfRow);
 
-    // Andere Tabs
-    for (const [id, hash] of Object.entries(state.remoteHashes)) {
-      const entry = document.createElement('div');
-      entry.className = 'entry';
-      const match = hash === state.codeHash;
-      entry.textContent = `📡 Tab ${id}: ${hash.substring(0,16)+'…'} ${match ? '✅' : '⚠️'}`;
-      if (!match) entry.style.color = '#ff6b6b';
-      box.appendChild(entry);
-    }
-
-    // Anzahl Tabs
-    document.getElementById('tabCountDisplay').textContent = Object.keys(state.remoteHashes).length + 1;
-
-    // Prüfe Konsistenz
-    checkCodeConsistency();
-  }
-
-  function addCodeCompareEntry(msg, type = 'ok') {
-    const box = document.getElementById('codeCompareBox');
-    const entry = document.createElement('div');
-    entry.className = 'entry ' + type;
-    entry.textContent = msg;
-    box.appendChild(entry);
-    while (box.children.length > 20) box.removeChild(box.lastChild);
-  }
-
-  // ─── ROLLEN‑SCAN (Integrität) ─────────────────────────────────
-  function scanRoleIntegrity() {
-    const now = Date.now();
-    const currentRole = state.isLeader ? 'LEADER' : 'FOLLOWER';
-    if (state.roleScan.lastRole !== currentRole) {
-      log(`🔍 Rollenwechsel → ${currentRole} (Tab ${state.tabId})`);
-      state.roleScan.lastRole = currentRole;
-    }
-    const hb = Number(localStorage.getItem(LEADER_KEY)) || 0;
-    if (hb < state.roleScan.lastHeartbeat) {
-      state.roleScan.mismatches.push(`⚠️ Heartbeat‑Drift → Tab ${state.tabId}`);
-    }
-    state.roleScan.lastHeartbeat = hb;
-    const stepTime = Math.max(100, 800 - state.speed * 60);
-    if (state.roleScan.lastStepTime !== null && state.roleScan.lastStepTime !== stepTime) {
-      state.roleScan.mismatches.push(`⚠️ StepTime‑Mismatch → Tab ${state.tabId}`);
-    }
-    state.roleScan.lastStepTime = stepTime;
-    if (state.roleScan.lastMode !== null && state.roleScan.lastMode !== state.mode) {
-      state.roleScan.mismatches.push(`⚠️ Mode‑Mismatch → Tab ${state.tabId}`);
-    }
-    state.roleScan.lastMode = state.mode;
-  }
-
-  // ─── UI-UPDATES ────────────────────────────────────────────────
-  function updateAllUI() {
-    const sym = ORBIT[state.index] || '?';
-    const axiom = AXIOM_MAP[sym] || '—';
-    document.getElementById('naviIndex').textContent = state.index;
-    document.getElementById('naviSymbol').textContent = sym;
-    document.getElementById('naviHeading').textContent = String(state.index * 12).padStart(3,'0') + '°';
-    document.getElementById('naviSpeed').textContent = (state.speed * 0.7 + state.index * 0.02).toFixed(1);
-    document.getElementById('naviMode').textContent = state.mode;
-    document.getElementById('axiomIQQ').textContent = state.mode === 'IQQ' ? '● aktiv' : '9 → 3 → 9 → 3';
-    document.getElementById('axiomOCTA').textContent = state.mode === 'OCTA' ? '● aktiv' : '◉ ◆ △ ▣ ↺';
-    document.getElementById('axiomA81').textContent = state.mode === 'A81' ? '● aktiv' : '27 · 81 · 243 · 729';
-    renderWaypoints();
-    const orbitStatus = document.getElementById('orbitStatus');
-    orbitStatus.textContent = state.running ? 'AKTIV' : 'PAUSE';
-    orbitStatus.className = 'badge ' + (state.running ? 'aktiv' : 'pause');
-    updateSliUI();
-    updateRoleBadge();
-  }
-
-  function updateSliUI() {
-    const badge = document.getElementById('sliStatusBadge');
-    const btn = document.getElementById('btnSliOpen');
-    if (state.sliOpen) {
-      badge.textContent = '🔓 offen';
-      badge.className = 'badge offen';
-      btn.textContent = '🔒 schließen';
-      btn.classList.add('primary');
-    } else {
-      badge.textContent = '🔒 geschlossen';
-      badge.className = 'badge geschlossen';
-      btn.textContent = '🔓 sli.open';
-      btn.classList.remove('primary');
+    for (const [id, info] of state.knownTabs) {
+      const row = document.createElement('div');
+      row.className = 'tab-row' + (info.mismatch ? ' mismatch' : '') + (info.role === 'AGENT' ? ' agent' : '');
+      row.innerHTML = `<span class="tid">${id}</span>` +
+        `<span class="trole">${info.role}</span>` +
+        `<span class="tfp">FP ${info.fingerprint}${info.mismatch ? ' ⚠️' : ''}</span>`;
+      box.appendChild(row);
     }
   }
 
-  function renderWaypoints() {
-    const container = document.getElementById('waypointList');
-    container.innerHTML = '';
-    for (let i = 0; i < 8; i++) {
-      const idx = (state.index + i) % ORBIT.length;
-      const sym = ORBIT[idx];
-      const span = document.createElement('span');
-      span.className = 'waypoint-item' + (i === 0 ? ' active' : '');
-      span.textContent = sym;
-      container.appendChild(span);
-    }
-  }
+  setInterval(broadcastPresence, HEARTBEAT_EVERY);
+  setInterval(renderTabScanner, 1000);
 
-  function applyModeButtons(mode) {
-    document.querySelectorAll('[id^="btnMode"]').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById('btnMode' + mode);
-    if (btn) btn.classList.add('active');
+  // ─── NC‑AGENT: MOVE ─────────────────────────────────────────────
+  function ncMove() {
+    state.axiomCount.NC = (state.axiomCount.NC || 0) + 1;
+    document.getElementById('axiomNC').textContent = `Agent · ${state.axiomCount.NC} Moves`;
+    log('🤖 NC‑Agent bewegt sich');
+    broadcast({ type: 'nc.move', index: state.index, ts: Date.now() });
   }
 
   // ─── CANVAS ────────────────────────────────────────────────────
+  const canvas = document.getElementById('orbitCanvas');
+  const ctx = canvas.getContext('2d');
+
   function drawOrbit() {
     const w = canvas.width, h = canvas.height;
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
+
     const history = state.history.slice(-5);
     history.forEach((idx, i) => {
-      const alpha = 0.1 + (i / 5) * 0.3;
-      const x = 80 + (w - 160) * (i / 4);
+      const alpha = 0.1 + (i / PATH_BASE) * 0.3;
+      const x = 80 + (w - 160) * (i / (PATH_BASE - 1));
       const y = h - 30;
       ctx.fillStyle = `rgba(108, 204, 255, ${alpha})`;
       ctx.font = '16px Consolas';
@@ -529,13 +434,14 @@
       if (i > 0) {
         ctx.strokeStyle = `rgba(108, 204, 255, ${alpha * 0.3})`;
         ctx.lineWidth = 1;
-        const prevX = 80 + (w - 160) * ((i - 1) / 4);
+        const prevX = 80 + (w - 160) * ((i - 1) / (PATH_BASE - 1));
         ctx.beginPath();
         ctx.moveTo(prevX, y);
         ctx.lineTo(x, y);
         ctx.stroke();
       }
     });
+
     const symbol = ORBIT[state.index] || '?';
     ctx.fillStyle = '#6cf';
     ctx.font = '60px Consolas';
@@ -545,63 +451,128 @@
     ctx.shadowBlur = 20;
     ctx.fillText(symbol, w / 2, h / 2 - 20);
     ctx.shadowBlur = 0;
-    const axiom = AXIOM_MAP[symbol] || '—';
+
+    const axiom = state.mode === 'NC' ? 'NC' : (AXIOM_MAP[symbol] || '—');
     ctx.fillStyle = '#5a7a8a';
     ctx.font = '14px Consolas';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(`#${state.index} · ${axiom}`, w / 2, h / 2 + 40);
+
     ctx.fillStyle = '#3a4a5a';
     ctx.font = '11px Consolas';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(`⏩ ${state.speed}× · ${state.mode} · Tab ${state.tabId}`, 12, h - 6);
+    ctx.fillText(`⏩ ${state.speed}× · ${state.mode}`, 12, h - 6);
     ctx.textAlign = 'right';
     ctx.fillText(`Symbol ${state.index + 1}/${ORBIT.length}`, w - 12, h - 6);
   }
 
-  // ─── ORBIT-STEP ────────────────────────────────────────────────
   function stepOrbit() {
     const next = (state.index + 1) % ORBIT.length;
     state.index = next;
+
     state.history.push(next);
     if (state.history.length > 10) state.history.shift();
-    state.atomTick++;
+
     const sym = ORBIT[next];
-    const axiom = AXIOM_MAP[sym] || null;
-    if (axiom && state.mode === axiom) {
-      state.axiomCount[axiom] = (state.axiomCount[axiom] || 0) + 1;
+
+    if (state.mode === 'NC') {
+      // NC hat keine eigenen Orbit-Symbole, deshalb zählt jeder
+      // Schritt im NC-Modus direkt als "NC-Move" statt über AXIOM_MAP
+      ncMove();
+    } else {
+      const axiom = AXIOM_MAP[sym] || null;
+      if (axiom && state.mode === axiom) {
+        state.axiomCount[axiom] = (state.axiomCount[axiom] || 0) + 1;
+      }
     }
-    updateAllUI();
-    log(`Orbit‑Schritt → ${sym} (${axiom || '—'})`);
+
+    log(`Orbit‑Schritt → ${sym} (${state.mode === 'NC' ? 'NC' : (AXIOM_MAP[sym] || '—')})`);
     broadcast({ type: 'orbit.step', index: state.index, symbol: sym });
   }
 
-  // ─── ATOM-UHR ──────────────────────────────────────────────────
-  function updateAtomClock(now) {
-    const time = new Date(now);
-    const ms = time.getMilliseconds();
-    const sec = time.getSeconds();
-    const min = time.getMinutes();
-    const hrs = time.getHours();
-    const timeStr = `${String(hrs).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
-    document.getElementById('atomTime').textContent = timeStr;
-    document.getElementById('atomTick').textContent = state.atomTick;
-    document.getElementById('atomDelta').textContent = (state.atomDelta || 0).toFixed(1);
+  function togglePlay() {
+    state.running = !state.running;
+    document.getElementById('btnPlay').textContent = state.running ? '⏸ Pause' : '▶ Start';
+    document.getElementById('orbitStatus').textContent = state.running ? 'AKTIV' : 'PAUSE';
+    document.getElementById('orbitStatus').className = 'badge ' + (state.running ? 'aktiv' : 'pause');
   }
 
-  // ─── HAUPT-LOOP ────────────────────────────────────────────────
+  function resetOrbit() {
+    state.index = 0;
+    state.history = [];
+    state.axiomCount = { IQQ: 0, OCTA: 0, A81: 0, NC: 0 };
+    state.accumulator = 0;
+    document.getElementById('axiomNC').textContent = 'Agent · 0 Moves';
+    log('⟲ Orbit zurückgesetzt');
+    broadcast({ type: 'orbit.reset' });
+  }
+
+  function applyModeButtons(mode) {
+    document.querySelectorAll('[id^="btnMode"]').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btnMode' + mode);
+    if (btn) btn.classList.add('active');
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    applyModeButtons(mode);
+    log(`🌀 Modus gewechselt: ${mode}`);
+    broadcast({ type: 'orbit.mode', mode });
+  }
+
+  function log(msg) {
+    const logBox = document.getElementById('log');
+    const atBottom = logBox.scrollTop + logBox.clientHeight >= logBox.scrollHeight - 5;
+    const time = new Date().toLocaleTimeString();
+    const line = document.createElement('div');
+    line.textContent = `[${time}] ${msg}`;
+    logBox.appendChild(line);
+    while (logBox.children.length > 80) logBox.removeChild(logBox.firstChild);
+    if (atBottom) logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  document.getElementById('btnPlay').addEventListener('click', togglePlay);
+  document.getElementById('btnStep').addEventListener('click', () => {
+    if (state.isLeader) stepOrbit();
+    else log('⏭ Manueller Schritt ignoriert (dieser Tab ist Follower)');
+  });
+  document.getElementById('btnReset').addEventListener('click', () => {
+    if (state.isLeader) resetOrbit();
+    else log('⟲ Reset ignoriert (dieser Tab ist Follower)');
+  });
+
+  document.getElementById('btnModeIQQ').addEventListener('click', () => setMode('IQQ'));
+  document.getElementById('btnModeOCTA').addEventListener('click', () => setMode('OCTA'));
+  document.getElementById('btnModeA81').addEventListener('click', () => setMode('A81'));
+  document.getElementById('btnModeNC').addEventListener('click', () => setMode('NC'));
+
+  const speedSlider = document.getElementById('speedSlider');
+  const speedLabel = document.getElementById('speedLabel');
+  speedSlider.addEventListener('input', () => {
+    state.speed = parseInt(speedSlider.value, 10);
+    speedLabel.textContent = state.speed + '×';
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+    if (e.key === 'ArrowRight' && state.isLeader) stepOrbit();
+    if (e.key === 'r' || e.key === 'R') { if (state.isLeader) resetOrbit(); }
+    if (e.key === '1') setMode('IQQ');
+    if (e.key === '2') setMode('OCTA');
+    if (e.key === '3') setMode('A81');
+    if (e.key === '4') setMode('NC');
+  });
+
   function loop(now) {
     if (state.lastFrame === null) state.lastFrame = now;
     const delta = now - state.lastFrame;
     state.lastFrame = now;
-    state.atomDelta = delta;
-
-    scanRoleIntegrity();
 
     if (state.running && state.isLeader) {
       state.accumulator += delta;
-      const stepTime = Math.max(100, 800 - state.speed * 60);
+      const stepTime = Math.max(STEP_MIN, STEP_BASE - state.speed * STEP_FACTOR);
       let guard = 0;
       while (state.accumulator >= stepTime && guard < 20) {
         stepOrbit();
@@ -613,108 +584,31 @@
     }
 
     drawOrbit();
-    updateAtomClock(now);
     requestAnimationFrame(loop);
   }
 
-  // ─── EVENT-BINDING ─────────────────────────────────────────────
-  document.getElementById('btnPlay').addEventListener('click', () => {
-    state.running = !state.running;
-    updateAllUI();
-    log(state.running ? '▶ Fortgesetzt' : '⏸ Pause');
-  });
+  function init() {
+    log('🧠 Module geladen: ' + loaded.length);
+    log('⚡ Axiom‑Orbit‑System v5 gestartet');
+    log(`🆔 Dieser Tab: ${state.tabId} · Fingerprint ${ownFingerprint}`);
 
-  document.getElementById('btnStep').addEventListener('click', () => {
-    if (state.isLeader) stepOrbit();
-    else log('⏭ Schritt nur Leader');
-  });
-
-  document.getElementById('btnReset').addEventListener('click', () => {
-    if (state.isLeader) {
-      state.index = 0;
-      state.history = [];
-      state.atomTick = 0;
-      updateAllUI();
-      log('⟲ Reset');
-      broadcast({ type: 'orbit.reset' });
-    } else {
-      log('⟲ Reset nur Leader');
-    }
-  });
-
-  document.getElementById('btnSliOpen').addEventListener('click', () => {
-    state.sliOpen = !state.sliOpen;
-    updateSliUI();
-    broadcast({ type: 'sli.open', open: state.sliOpen });
-    log(`🔓 sli.open = ${state.sliOpen ? 'OFFEN' : 'GESCHLOSSEN'}`);
-  });
-
-  const speedSlider = document.getElementById('speedSlider');
-  const speedLabel = document.getElementById('speedLabel');
-  speedSlider.addEventListener('input', () => {
-    state.speed = parseInt(speedSlider.value, 10);
-    speedLabel.textContent = state.speed + '×';
-  });
-
-  document.querySelectorAll('[id^="btnMode"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = btn.id.replace('btnMode','');
-      state.mode = mode;
-      applyModeButtons(mode);
-      updateAllUI();
-      broadcast({ type: 'orbit.mode', mode });
-      log(`🌀 Modus: ${mode}`);
-    });
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === ' ') { e.preventDefault(); document.getElementById('btnPlay').click(); }
-    if (e.key === 'ArrowRight' && state.isLeader) stepOrbit();
-    if (e.key === 'r' || e.key === 'R') document.getElementById('btnReset').click();
-    if (e.key === 's' || e.key === 'S') document.getElementById('btnSliOpen').click();
-  });
-
-  // ─── LOG ────────────────────────────────────────────────────────
-  function log(msg) {
-    const time = new Date().toLocaleTimeString();
-    const line = document.createElement('div');
-    line.textContent = `[${time}] ${msg}`;
-    logBox.appendChild(line);
-    while (logBox.children.length > 60) logBox.removeChild(logBox.firstChild);
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-
-  // ─── INIT ──────────────────────────────────────────────────────
-  async function init() {
+    setMode('IQQ');
     state.history.push(0);
-    updateAllUI();
     updateRoleBadge();
-    applyModeButtons('IQQ');
-    log('💎 Diamond Edition gestartet');
-    log(`🔑 Tab‑ID: ${state.tabId}`);
+    broadcastPresence();
 
-    // Code‑Fingerprint berechnen und broadcasten
-    await initCodeCompare();
-
-    // Heartbeat für Tab‑Verlassen: alle 5 Sekunden den eigenen Hash senden
-    setInterval(() => {
-      if (state.codeHash) {
-        broadcast({ type: 'code.hash', tabId: state.tabId, hash: state.codeHash });
-      }
-    }, 5000);
-
-    // Beim Schließen des Tabs: anderen mitteilen
-    window.addEventListener('beforeunload', () => {
-      broadcast({ type: 'tab.leave', tabId: state.tabId });
-    });
-
-    log('⌨️  Leertaste=Pause  →=Schritt  r=Reset  s=sli.open');
-    log('🔐 Code‑Vergleich aktiv – SHA‑256 Fingerprint wird überwacht');
     requestAnimationFrame(loop);
+
+    log('⌨️  Leertaste=Pause  →=Schritt  r=Reset  1=IQQ  2=OCTA  3=A81  4=NC');
+    log('👑 Leader‑Election mit Tie‑Breaking aktiv · 🔍 Scanner beobachtet alle Tabs · 🤖 NC‑Agent bereit');
   }
 
-  window.addEventListener('error', (e) => log('⚠️ Fehler: ' + e.message), true);
+  window.addEventListener('error', (e) => {
+    log('⚠️ Fehler: ' + e.message);
+  }, true);
+
   setInterval(updateRoleBadge, HEARTBEAT_EVERY);
+
   init();
 </script>
 
